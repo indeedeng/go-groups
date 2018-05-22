@@ -1,0 +1,8 @@
+*~
+*.iml
+*.swp
+*.swo
+*.out
+**/.idea
+gg
+go-groups
