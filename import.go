@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+// Imports represents the list of imports in a given go file.
+// This helper encapsulates the logic for sorting immports based on go-groups.
 type Imports []string
 
 var _ sort.Interface = (*Imports)(nil)
