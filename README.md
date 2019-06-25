@@ -9,6 +9,13 @@ the imports.
 `go-groups` is similar to `goimports`, but in addition to sorting imports 
 lexigraphically, it also separates import blocks at a per-project level.
 
+## Status
+
+![GitHub](https://img.shields.io/github/license/indeedeng/go-groups.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/indeedeng/go-groups)](https://goreportcard.com/report/github.com/indeedeng/go-groups)
+[![Build Status](https://travis-ci.com/indeedeng/go-groups.svg?branch=master)](https://travis-ci.com/indeedeng/go-groups)
+![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/indeedeng/go-groups.svg)
+
 # Getting Started
 
 The `go-groups` command can be installed by running:
