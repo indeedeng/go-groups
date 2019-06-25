@@ -41,7 +41,7 @@ import (
 	"testing"
 )
 
-// code stolen from https://golang.org/src/cmd/gofmt/gofmt_test.go
+// based on https://golang.org/src/cmd/gofmt/gofmt_test.go with a few modifications
 
 
 func TestBackupFile(t *testing.T) {

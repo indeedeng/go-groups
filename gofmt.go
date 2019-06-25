@@ -42,7 +42,7 @@ import (
 	"strings"
 )
 
-// code stolen from https://golang.org/src/cmd/gofmt/gofmt.go
+// based on https://golang.org/src/cmd/gofmt/gofmt.go with a few modifications
 
 // If in == nil, the source is the contents of the file with the given filename.
 func processFile(filename string, in io.Reader, out io.Writer) error {

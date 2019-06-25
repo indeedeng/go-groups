@@ -83,12 +83,10 @@ GitHub issues, pull requests, and questions within a couple of business days.
 
 # Code of Conduct
 
-`oss.indeed.com/go/go-groups` is governed by the[Contributer Covenant v1.4.1](version/1/4/code-of-conduct.html)
+`oss.indeed.com/go/go-groups` is governed by the[Contributer Covenant v1.4.1](CODE_OF_CONDUCT.md)
 
 For more information please contact opensource@indeed.com.
 
 # License
 
-The `oss.indeed.com/go/go-groups` module is open source under the BSD-3-Clause
-license.
-
+The `oss.indeed.com/go/go-groups` module is open source under the [BSD-3-Clause](LICENSE) license.
