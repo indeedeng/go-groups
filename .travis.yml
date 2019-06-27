@@ -8,7 +8,6 @@ env:
 
 before_install:
   - go get golang.org/x/lint/golint
-  - go get github.com/mitchellh/gox
 
 install:
 # skip
@@ -18,16 +17,3 @@ script:
   - go vet ./...
   - golint -set_exit_status ./...
   - go test -v ./...
-  - gox -os="windows darwin" -arch="amd64 386" -output="bin/{{.Dir}}_{{.OS}}_{{.Arch}}"
-  - gox -os="linux" -arch="amd64 386 arm arm64" -output="bin/{{.Dir}}_{{.OS}}_{{.Arch}}"
-
-deploy:
-  provider: releases
-  skip_cleanup: true
-  api_key:
-    secure: "${GITHUB_OAUTH_TOKEN_SECURE}"
-  file_glob: true
-  file: bin/*
-  on:
-    repo: indeedeng/go-groups
-    tags: true
