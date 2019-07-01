@@ -2,7 +2,7 @@ go-groups
 =========
 
 [![Go Report Card](https://goreportcard.com/badge/oss.indeed.com/go/go-groups)](https://goreportcard.com/report/oss.indeed.com/go/go-groups)
-[![Build Status](https://travis-ci.org/indeedeng/go-groups.svg?branch=master)](https://travis-ci.org/indeedeng/go-groups)
+[![Build Status](https://travis-ci.com/indeedeng/go-groups.svg?branch=master)](https://travis-ci.org/indeedeng/go-groups)
 [![GoDoc](https://godoc.org/oss.indeed.com/go/go-groups?status.svg)](https://godoc.org/oss.indeed.com/go/go-groups)
 [![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/indeedeng/go-groups.svg)](OSSMETADATA)
 [![GitHub](https://img.shields.io/github/license/indeedeng/go-groups.svg)](LICENSE)
