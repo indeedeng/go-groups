@@ -52,7 +52,7 @@ import (
 #### Typical Workflow
 
 1. Run `go-groups -w ./..` to rewrite and sort import groupings
-2. Run `go fmt -w ./..` to format your go source file
+2. Run `gofmt -w ./..` to format your go source file
 
 #### More info
 
