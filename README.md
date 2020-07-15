@@ -15,6 +15,8 @@ the imports.
 
 `go-groups` is similar to `goimports`, but in addition to sorting imports 
 lexigraphically, it also separates import blocks at a per-project level.
+Like `goimports`, `go-groups` also runs gofmt and fixes any style/formatting
+issues.
 
 
 # Getting Started
@@ -51,8 +53,7 @@ import (
 
 #### Typical Workflow
 
-1. Run `go-groups -w ./..` to rewrite and sort import groupings
-2. Run `gofmt -w ./..` to format your go source file
+Run `go-groups -w ./..` to rewrite and sort import groupings for go source files in a project.
 
 #### More info
 
