@@ -24,7 +24,7 @@ var (
 	importEndRegex   = regexp.MustCompile(`^\s*\)\s*$`)
 
 	// any whitespace + any unicode_letter_or_underscore + any unicode_letter_or_underscore_or_unicode number + any whitespace + quote + any + quote + any
-	groupedImportRegex = regexp.MustCompile(`^\s*[\p{L}_]*[\s*[\p{L}_\p{N}]*\s*".*".*$`)
+	groupedImportRegex = regexp.MustCompile(`^\s*[\p{L}_\\.]*[\s*[\p{L}_\p{N}]*\s*".*".*$`)
 	externalImport     = regexp.MustCompile(`"([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?\/([\p{L}_\-\p{N}]*)\/?.*"`)
 
 	list    = flag.Bool("l", false, "list files whose formatting differs")
