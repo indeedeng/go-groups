@@ -16,7 +16,7 @@ const (
 	exitBadStdin      = 2
 	exitInternalError = 3
 
-	versionStr = "go-groups version 1.0.3 (2019-06-20)"
+	versionStr = "go-groups version 1.1.0 (2020-07-15)"
 )
 
 var (
@@ -27,10 +27,11 @@ var (
 	groupedImportRegex = regexp.MustCompile(`^\s*[\p{L}_\\.]*[\s*[\p{L}_\p{N}]*\s*".*".*$`)
 	externalImport     = regexp.MustCompile(`"([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?\/([\p{L}_\-\p{N}]*)\/?.*"`)
 
-	list    = flag.Bool("l", false, "list files whose formatting differs")
-	write   = flag.Bool("w", false, "write result to (source) file instead of stdout")
-	doDiff  = flag.Bool("d", false, "display diffs instead of rewriting files")
-	version = flag.Bool("v", false, "display the version of go-groups")
+	list     = flag.Bool("l", false, "list files whose formatting differs")
+	write    = flag.Bool("w", false, "write result to (source) file instead of stdout")
+	doDiff   = flag.Bool("d", false, "display diffs instead of rewriting files")
+	version  = flag.Bool("v", false, "display the version of go-groups")
+	noFormat = flag.Bool("f", false, "disables the automatic gofmt style fixes")
 )
 
 func main() {
@@ -48,7 +49,7 @@ func main() {
 			_, _ = fmt.Fprintln(os.Stderr, "error: cannot use -w with standard input")
 			os.Exit(exitBadStdin)
 		}
-		if err := processFile("<standard input>", os.Stdin, os.Stdout); err != nil {
+		if err := processFile("<standard input>", os.Stdin, os.Stdout, !*noFormat); err != nil {
 			_, _ = fmt.Fprintln(os.Stderr, "failed to parse stdin: "+err.Error())
 			os.Exit(exitBadFlags)
 		}
@@ -67,7 +68,7 @@ func main() {
 				os.Exit(exitInternalError)
 			}
 		default:
-			_ = processFile(path, nil, os.Stdout)
+			_ = processFile(path, nil, os.Stdout, !*noFormat)
 		}
 	}
 }

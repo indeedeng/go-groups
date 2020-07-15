@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"io/ioutil"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -77,6 +79,28 @@ func TestParse_Multiline_CommentedImports(t *testing.T) {
 	result, rewritten := parse(bytes)
 	require.True(t, rewritten)
 	require.Equal(t, string(expected), string(result))
+}
+
+func TestParse_gofmt(t *testing.T) {
+	b := testdata(t, "gofmt_invalid.txt")
+	expected := testdata(t, "gofmt.txt")
+
+	var buf bytes.Buffer
+	err := processFile("", strings.NewReader(string(b)), &buf, true)
+	require.NoError(t, err)
+
+	require.Equal(t, string(expected), buf.String())
+}
+
+func TestParse_gofmt_disabled(t *testing.T) {
+	b := testdata(t, "gofmt_invalid.txt")
+	expected := testdata(t, "gofmt_invalid.txt")
+
+	var buf bytes.Buffer
+	err := processFile("", strings.NewReader(string(b)), &buf, false)
+	require.NoError(t, err)
+
+	require.Equal(t, string(expected), buf.String())
 }
 
 func testdata(t *testing.T, str string) []byte {

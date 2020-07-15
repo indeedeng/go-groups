@@ -52,7 +52,7 @@ func isGoFile(f os.FileInfo) bool {
 }
 
 // If in == nil, the source is the contents of the file with the given filename.
-func processFile(filename string, in io.Reader, out io.Writer) error {
+func processFile(filename string, in io.Reader, out io.Writer, fixFmt bool) error {
 	var perm os.FileMode = 0644
 	if in == nil {
 		f, err := os.Open(filename)
@@ -73,8 +73,19 @@ func processFile(filename string, in io.Reader, out io.Writer) error {
 		return err
 	}
 
-	res, rewritten := parse(src)
+	if fixFmt {
+		buffer := bytes.Buffer{}
+		buffer.Write(src)
+		cmd := exec.Command("gofmt", "--")
+		cmd.Stdin = &buffer
+		cmd.Stderr = os.Stderr
+		src, err = cmd.Output()
+		if err != nil {
+			return err
+		}
+	}
 
+	res, rewritten := parse(src)
 	if !bytes.Equal(src, res) && rewritten {
 		// formatting has changed
 		if *list {
@@ -120,7 +131,7 @@ func processFile(filename string, in io.Reader, out io.Writer) error {
 
 func visitFile(path string, f os.FileInfo, err error) error {
 	if err == nil && isGoFile(f) {
-		err = processFile(path, nil, os.Stdout)
+		err = processFile(path, nil, os.Stdout, !*noFormat)
 	}
 	// Don't complain if a file was deleted in the meantime (i.e.
 	// the directory changed concurrently while running gofmt).
