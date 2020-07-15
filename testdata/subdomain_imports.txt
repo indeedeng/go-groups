@@ -1,0 +1,18 @@
+package foo
+
+import (
+	"context"
+	"io"
+	"net/http"
+	"strconv"
+	"strings"
+
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+
+	"github.com/shoenig/petrify/v4"
+
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
+
+	"google.golang.org/grpc"
+)

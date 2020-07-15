@@ -33,6 +33,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"go/scanner"
 	"io"
 	"io/ioutil"
 	"os"
@@ -43,6 +44,12 @@ import (
 )
 
 // based on https://golang.org/src/cmd/gofmt/gofmt.go with a few modifications
+
+func isGoFile(f os.FileInfo) bool {
+	// ignore non-Go files
+	name := f.Name()
+	return !f.IsDir() && !strings.HasPrefix(name, ".") && strings.HasSuffix(name, ".go")
+}
 
 // If in == nil, the source is the contents of the file with the given filename.
 func processFile(filename string, in io.Reader, out io.Writer) error {
@@ -66,26 +73,24 @@ func processFile(filename string, in io.Reader, out io.Writer) error {
 		return err
 	}
 
-	result, rewrite := parse(src)
-	// nothing to do, file has no imports
-	if !rewrite {
-		return nil
-	}
+	res, rewritten := parse(src)
 
-	// something to do
-	if !bytes.Equal(src, result) {
+	if !bytes.Equal(src, res) && rewritten {
+		// formatting has changed
 		if *list {
-			fmt.Fprintln(out, filename)
+			if _, err := fmt.Fprintln(out, filename); err != nil { //nolint:govet
+				return err
+			}
 		}
 		if *write {
 			// make a temporary backup before overwriting original
-			bakname, err := backupFile(filename+".", src, perm)
+			bakname, err := backupFile(filename+".", src, perm) //nolint:govet
 			if err != nil {
 				return err
 			}
-			err = ioutil.WriteFile(filename, result, perm)
+			err = ioutil.WriteFile(filename, res, perm)
 			if err != nil {
-				os.Rename(bakname, filename)
+				_ = os.Rename(bakname, filename)
 				return err
 			}
 			err = os.Remove(bakname)
@@ -94,18 +99,22 @@ func processFile(filename string, in io.Reader, out io.Writer) error {
 			}
 		}
 		if *doDiff {
-			data, err := diff(src, result, filename)
+			data, err := diff(src, res, filename) //nolint:govet
 			if err != nil {
 				return fmt.Errorf("computing diff: %s", err)
 			}
 			fmt.Printf("diff -u %s %s\n", filepath.ToSlash(filename+".orig"), filepath.ToSlash(filename))
-			out.Write(data)
+			_, err = out.Write(data)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	if !*list && !*write && !*doDiff {
-		_, err = out.Write(result)
+		_, err = out.Write(res)
 	}
+
 	return err
 }
 
@@ -114,37 +123,15 @@ func visitFile(path string, f os.FileInfo, err error) error {
 		err = processFile(path, nil, os.Stdout)
 	}
 	// Don't complain if a file was deleted in the meantime (i.e.
-	// the directory changed concurrently while running).
+	// the directory changed concurrently while running gofmt).
 	if err != nil && !os.IsNotExist(err) {
-		return err
+		scanner.PrintError(os.Stderr, err)
 	}
 	return nil
 }
 
 func walkDir(path string) error {
 	return filepath.Walk(path, visitFile)
-}
-
-func isGoFile(f os.FileInfo) bool {
-	// ignore non-Go files
-	name := f.Name()
-	return !f.IsDir() && !strings.HasPrefix(name, ".") && strings.HasSuffix(name, ".go")
-}
-
-func writeTempFile(dir, prefix string, data []byte) (string, error) {
-	file, err := ioutil.TempFile(dir, prefix)
-	if err != nil {
-		return "", err
-	}
-	_, err = file.Write(data)
-	if err1 := file.Close(); err == nil {
-		err = err1
-	}
-	if err != nil {
-		os.Remove(file.Name())
-		return "", err
-	}
-	return file.Name(), nil
 }
 
 func diff(b1, b2 []byte, filename string) (data []byte, err error) {
@@ -172,6 +159,22 @@ func diff(b1, b2 []byte, filename string) (data []byte, err error) {
 		return replaceTempFilename(data, filename)
 	}
 	return
+}
+
+func writeTempFile(dir, prefix string, data []byte) (string, error) {
+	file, err := ioutil.TempFile(dir, prefix)
+	if err != nil {
+		return "", err
+	}
+	_, err = file.Write(data)
+	if err1 := file.Close(); err == nil {
+		err = err1
+	}
+	if err != nil {
+		os.Remove(file.Name())
+		return "", err
+	}
+	return file.Name(), nil
 }
 
 // replaceTempFilename replaces temporary filenames in diff with actual one.

@@ -1,19 +1,4 @@
 language: go
 
 go:
-  - 1.12.x
-
-env:
-  - GO111MODULE=on
-
-before_install:
-  - go get golang.org/x/lint/golint
-
-install:
-# skip
-
-script:
-  - go get -v ./...
-  - go vet ./...
-  - golint -set_exit_status ./...
-  - go test -v ./...
+  - 1.14.x

@@ -1,0 +1,25 @@
+package main
+
+import (
+	"error"
+	"fmt"
+	// example comment
+	// comment continues
+	// and continues
+	"io"
+	// example comment
+	"log"
+
+	// go-groups comment
+	"github.com/indeedeng/go-groups"
+
+	// followup comment
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
+
+	"google.golang.org/grpc"
+)
+
+func main() {
+	fmt.Println("Hello world")
+}

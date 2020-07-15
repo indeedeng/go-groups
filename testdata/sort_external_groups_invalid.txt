@@ -1,0 +1,13 @@
+package foo
+
+import (
+    "net/http"
+    "testing"
+
+    "indeed.com/devops/libmarvin/gin/ginhandler"
+    "indeed.com/devops/libmarvin/spec"
+    "indeed.com/devops/marvlet/api/v2"
+
+    "github.com/gin-gonic/gin"
+    "github.com/stretchr/testify/suite"
+)
