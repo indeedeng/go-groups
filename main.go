@@ -137,22 +137,23 @@ func fixupFile(contents map[int]string, numLines int, groups []importGroup) []by
 			continue
 		}
 		for _, group := range groups {
-			if group.lineStart == i {
-				buffer.WriteString("import (\n")
-				leadingWhitespace := true
-				for _, line := range group.lines {
-					if leadingWhitespace && strings.TrimSpace(line) == "" {
-						// skip empty leading import lines
-					} else {
-						buffer.WriteString(line)
-						buffer.WriteString("\n")
-						leadingWhitespace = false
-					}
-				}
-				buffer.WriteString(")\n")
-				i = group.lineEnd
-				break
+			if group.lineStart != i {
+				continue
 			}
+			buffer.WriteString("import (\n")
+			leadingWhitespace := true
+			for _, line := range group.lines {
+				if leadingWhitespace && strings.TrimSpace(line) == "" {
+					// skip empty leading import lines
+				} else {
+					buffer.WriteString(line)
+					buffer.WriteString("\n")
+					leadingWhitespace = false
+				}
+			}
+			buffer.WriteString(")\n")
+			i = group.lineEnd
+			break
 		}
 	}
 	return buffer.Bytes()
@@ -167,7 +168,7 @@ func regroupImportGroups(group importGroup) importGroup {
 	standardImports := make(Imports, 0, len(group.lines))
 
 	sortedKeys := make([]string, 0)
-	groupNames := make(map[string]Imports, 0)
+	groupNames := make(map[string]Imports)
 	for _, importLine := range group.lines {
 		matches := externalImport.FindStringSubmatch(importLine)
 
