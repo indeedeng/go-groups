@@ -1,0 +1,14 @@
+package main
+
+import (
+	"fmt"
+)
+
+var (
+	foo =  "misaligned"
+	bar =    "variables"
+)
+
+func main() {
+	fmt.Println("Hello world")
+}

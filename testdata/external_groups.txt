@@ -1,0 +1,16 @@
+package foo
+
+import (
+	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
+	"strconv"
+	"strings"
+
+	"github.com/hashicorp/vault/x"
+
+	"indeed.com/devops/foobar"
+
+	"indeed.com/gophers/quz"
+)

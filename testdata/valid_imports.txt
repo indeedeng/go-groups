@@ -1,0 +1,10 @@
+package foo
+
+import (
+	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
+	"strconv"
+	"strings"
+)
