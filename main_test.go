@@ -17,7 +17,7 @@ func TestParse_ValidGroupingSortImports(t *testing.T) {
 	result, rewritten := parse(bytes)
 
 	require.True(t, rewritten)
-	require.Equal(t, bytes, result)
+	require.Equal(t, string(bytes), string(result))
 }
 
 func TestParse_ExtraGroups(t *testing.T) {
@@ -34,7 +34,7 @@ func TestParse_ExternalGroups(t *testing.T) {
 	result, rewritten := parse(bytes)
 
 	require.True(t, rewritten)
-	require.Equal(t, expected, result)
+	require.Equal(t, string(expected), string(result))
 }
 
 func TestParse_SortingExternalGroups(t *testing.T) {
@@ -61,7 +61,22 @@ func TestParse_SubdomainImports(t *testing.T) {
 	result, rewritten := parse(bytes)
 
 	require.True(t, rewritten)
-	require.Equal(t, expected, result)
+	require.Equal(t, string(expected), string(result))
+}
+
+func TestParse_CommentedImports(t *testing.T) {
+	bytes := testdata(t, "commented_imports.txt")
+	result, rewritten := parse(bytes)
+	require.True(t, rewritten)
+	require.Equal(t, string(bytes), string(result))
+}
+
+func TestParse_Multiline_CommentedImports(t *testing.T) {
+	bytes := testdata(t, "multiline_comments_invalid.txt")
+	expected := testdata(t, "multiline_comments.txt")
+	result, rewritten := parse(bytes)
+	require.True(t, rewritten)
+	require.Equal(t, string(expected), string(result))
 }
 
 func testdata(t *testing.T, str string) []byte {
