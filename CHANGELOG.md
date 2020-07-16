@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2020-08-06
+### Fixed
+- go-groups correctly detects generated code and ignores generated code by default
+
 ## [1.1.1] - 2020-08-06
 ### Added
 - Added -g flag to instruct go-groups to analyze and include generated code

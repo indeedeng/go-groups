@@ -85,7 +85,7 @@ func processFile(filename string, in io.Reader, out io.Writer, fixFmt, generated
 	}
 
 	if !generatedCode && isGeneratedCode(src) {
-		if !*list {
+		if !*list && !*write && !*doDiff {
 			_, err = out.Write(src)
 			if err != nil {
 				return err
