@@ -31,6 +31,7 @@ package main
 */
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"go/scanner"
@@ -43,6 +44,16 @@ import (
 	"strings"
 )
 
+func isGeneratedCode(src []byte) bool {
+	scanner := bufio.NewScanner(bytes.NewReader(src))
+	for scanner.Scan() {
+		if generatedRegex.MatchString(scanner.Text()) {
+			return true
+		}
+	}
+	return false
+}
+
 // based on https://golang.org/src/cmd/gofmt/gofmt.go with a few modifications
 
 func isGoFile(f os.FileInfo) bool {
@@ -52,7 +63,7 @@ func isGoFile(f os.FileInfo) bool {
 }
 
 // If in == nil, the source is the contents of the file with the given filename.
-func processFile(filename string, in io.Reader, out io.Writer, fixFmt bool) error {
+func processFile(filename string, in io.Reader, out io.Writer, fixFmt, generatedCode bool) error {
 	var perm os.FileMode = 0644
 	if in == nil {
 		f, err := os.Open(filename)
@@ -73,6 +84,16 @@ func processFile(filename string, in io.Reader, out io.Writer, fixFmt bool) erro
 		return err
 	}
 
+	if !generatedCode && isGeneratedCode(src) {
+		if !*list {
+			_, err = out.Write(src)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
 	if fixFmt {
 		buffer := bytes.Buffer{}
 		buffer.Write(src)
@@ -89,13 +110,13 @@ func processFile(filename string, in io.Reader, out io.Writer, fixFmt bool) erro
 	if !bytes.Equal(src, res) && rewritten {
 		// formatting has changed
 		if *list {
-			if _, err := fmt.Fprintln(out, filename); err != nil { //nolint:govet
+			if _, err := fmt.Fprintln(out, filename); err != nil {
 				return err
 			}
 		}
 		if *write {
 			// make a temporary backup before overwriting original
-			bakname, err := backupFile(filename+".", src, perm) //nolint:govet
+			bakname, err := backupFile(filename+".", src, perm)
 			if err != nil {
 				return err
 			}
@@ -110,7 +131,7 @@ func processFile(filename string, in io.Reader, out io.Writer, fixFmt bool) erro
 			}
 		}
 		if *doDiff {
-			data, err := diff(src, res, filename) //nolint:govet
+			data, err := diff(src, res, filename)
 			if err != nil {
 				return fmt.Errorf("computing diff: %s", err)
 			}
@@ -131,7 +152,7 @@ func processFile(filename string, in io.Reader, out io.Writer, fixFmt bool) erro
 
 func visitFile(path string, f os.FileInfo, err error) error {
 	if err == nil && isGoFile(f) {
-		err = processFile(path, nil, os.Stdout, !*noFormat)
+		err = processFile(path, nil, os.Stdout, !*noFormat, *genCode)
 	}
 	// Don't complain if a file was deleted in the meantime (i.e.
 	// the directory changed concurrently while running gofmt).

@@ -16,22 +16,25 @@ const (
 	exitBadStdin      = 2
 	exitInternalError = 3
 
-	versionStr = "go-groups version 1.1.0 (2020-07-15)"
+	versionStr = "go-groups version 1.1.1 (2020-08-06)"
 )
 
 var (
 	importStartRegex = regexp.MustCompile(`^\s*import\s*\(\s*$`)
 	importEndRegex   = regexp.MustCompile(`^\s*\)\s*$`)
 
-	// any whitespace + any unicode_letter_or_underscore + any unicode_letter_or_underscore_or_unicode number + any whitespace + quote + any + quote + any
+	// any whitespace + any unicode_letter_or_underscore + any unicode_letter_or_underscore_or_unicode number + any whitespace + quote + any + quote + any.
 	groupedImportRegex = regexp.MustCompile(`^\s*[\p{L}_\\.]*[\s*[\p{L}_\p{N}]*\s*".*".*$`)
 	externalImport     = regexp.MustCompile(`"([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?\/([\p{L}_\-\p{N}]*)\/?.*"`)
+	// see https://golang.org/pkg/cmd/go/internal/generate/ for details.
+	generatedRegex = regexp.MustCompile(`^// Code generated .* DO NOT EDIT.$`)
 
 	list     = flag.Bool("l", false, "list files whose formatting differs")
 	write    = flag.Bool("w", false, "write result to (source) file instead of stdout")
 	doDiff   = flag.Bool("d", false, "display diffs instead of rewriting files")
 	version  = flag.Bool("v", false, "display the version of go-groups")
 	noFormat = flag.Bool("f", false, "disables the automatic gofmt style fixes")
+	genCode  = flag.Bool("g", false, "include generated code in analysis")
 )
 
 func main() {
@@ -49,7 +52,7 @@ func main() {
 			_, _ = fmt.Fprintln(os.Stderr, "error: cannot use -w with standard input")
 			os.Exit(exitBadStdin)
 		}
-		if err := processFile("<standard input>", os.Stdin, os.Stdout, !*noFormat); err != nil {
+		if err := processFile("<standard input>", os.Stdin, os.Stdout, !*noFormat, *genCode); err != nil {
 			_, _ = fmt.Fprintln(os.Stderr, "failed to parse stdin: "+err.Error())
 			os.Exit(exitBadFlags)
 		}
@@ -68,7 +71,7 @@ func main() {
 				os.Exit(exitInternalError)
 			}
 		default:
-			_ = processFile(path, nil, os.Stdout, !*noFormat)
+			_ = processFile(path, nil, os.Stdout, !*noFormat, *genCode)
 		}
 	}
 }
@@ -113,7 +116,7 @@ func parse(src []byte) (result []byte, rewritten bool) {
 				group.lineEnd = n
 				groups = append(groups, group)
 			} else if groupedImportRegex.MatchString(line) {
-				importLine := importLine{ //nolint:govet
+				importLine := importLine{
 					line: line,
 				}
 				var above, below int
@@ -220,7 +223,7 @@ func fixupFile(contents map[int]string, numLines int, groups []importGroup) []by
 // standard library imports are grouped together and sorted alphabetically
 // each second-level external import is grouped together (e.g github.com/pkg.* is one group)
 // each of these second-level groups is discovered and sorted alphabetically
-// then each import is matched with their group and the list of lines to be written is built up
+// then each import is matched with their group and the list of lines to be written is built up.
 func regroupImportGroups(group importGroup) importGroup {
 	standardImports := make(Imports, 0, len(group.lines))
 
