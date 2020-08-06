@@ -89,13 +89,13 @@ func processFile(filename string, in io.Reader, out io.Writer, fixFmt bool) erro
 	if !bytes.Equal(src, res) && rewritten {
 		// formatting has changed
 		if *list {
-			if _, err := fmt.Fprintln(out, filename); err != nil { //nolint:govet
+			if _, err := fmt.Fprintln(out, filename); err != nil {
 				return err
 			}
 		}
 		if *write {
 			// make a temporary backup before overwriting original
-			bakname, err := backupFile(filename+".", src, perm) //nolint:govet
+			bakname, err := backupFile(filename+".", src, perm)
 			if err != nil {
 				return err
 			}
@@ -110,7 +110,7 @@ func processFile(filename string, in io.Reader, out io.Writer, fixFmt bool) erro
 			}
 		}
 		if *doDiff {
-			data, err := diff(src, res, filename) //nolint:govet
+			data, err := diff(src, res, filename)
 			if err != nil {
 				return fmt.Errorf("computing diff: %s", err)
 			}

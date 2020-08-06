@@ -23,7 +23,7 @@ var (
 	importStartRegex = regexp.MustCompile(`^\s*import\s*\(\s*$`)
 	importEndRegex   = regexp.MustCompile(`^\s*\)\s*$`)
 
-	// any whitespace + any unicode_letter_or_underscore + any unicode_letter_or_underscore_or_unicode number + any whitespace + quote + any + quote + any
+	// any whitespace + any unicode_letter_or_underscore + any unicode_letter_or_underscore_or_unicode number + any whitespace + quote + any + quote + any.
 	groupedImportRegex = regexp.MustCompile(`^\s*[\p{L}_\\.]*[\s*[\p{L}_\p{N}]*\s*".*".*$`)
 	externalImport     = regexp.MustCompile(`"([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?\/([\p{L}_\-\p{N}]*)\/?.*"`)
 
@@ -113,7 +113,7 @@ func parse(src []byte) (result []byte, rewritten bool) {
 				group.lineEnd = n
 				groups = append(groups, group)
 			} else if groupedImportRegex.MatchString(line) {
-				importLine := importLine{ //nolint:govet
+				importLine := importLine{
 					line: line,
 				}
 				var above, below int
@@ -220,7 +220,7 @@ func fixupFile(contents map[int]string, numLines int, groups []importGroup) []by
 // standard library imports are grouped together and sorted alphabetically
 // each second-level external import is grouped together (e.g github.com/pkg.* is one group)
 // each of these second-level groups is discovered and sorted alphabetically
-// then each import is matched with their group and the list of lines to be written is built up
+// then each import is matched with their group and the list of lines to be written is built up.
 func regroupImportGroups(group importGroup) importGroup {
 	standardImports := make(Imports, 0, len(group.lines))
 

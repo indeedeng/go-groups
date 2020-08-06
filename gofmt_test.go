@@ -41,7 +41,7 @@ import (
 	"testing"
 )
 
-// based on https://golang.org/src/cmd/gofmt/gofmt_test.go with a few modifications
+// based on https://golang.org/src/cmd/gofmt/gofmt_test.go with a few modifications.
 func TestBackupFile(t *testing.T) {
 	dir, err := ioutil.TempDir("", "gofmt_test")
 	if err != nil {
