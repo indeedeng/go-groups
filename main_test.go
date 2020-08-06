@@ -86,7 +86,7 @@ func TestParse_gofmt(t *testing.T) {
 	expected := testdata(t, "gofmt.txt")
 
 	var buf bytes.Buffer
-	err := processFile("", strings.NewReader(string(b)), &buf, true)
+	err := processFile("", strings.NewReader(string(b)), &buf, true, false)
 	require.NoError(t, err)
 
 	require.Equal(t, string(expected), buf.String())
@@ -97,7 +97,29 @@ func TestParse_gofmt_disabled(t *testing.T) {
 	expected := testdata(t, "gofmt_invalid.txt")
 
 	var buf bytes.Buffer
-	err := processFile("", strings.NewReader(string(b)), &buf, false)
+	err := processFile("", strings.NewReader(string(b)), &buf, false, false)
+	require.NoError(t, err)
+
+	require.Equal(t, string(expected), buf.String())
+}
+
+func TestParse_generated_code(t *testing.T) {
+	b := testdata(t, "code_generated.txt")
+	expected := testdata(t, "code_generated.txt")
+
+	var buf bytes.Buffer
+	err := processFile("", strings.NewReader(string(b)), &buf, true, false)
+	require.NoError(t, err)
+
+	require.Equal(t, string(expected), buf.String())
+}
+
+func TestParse_generated_code_enabled(t *testing.T) {
+	b := testdata(t, "code_generated.txt")
+	expected := testdata(t, "code_generated_valid.txt")
+
+	var buf bytes.Buffer
+	err := processFile("", strings.NewReader(string(b)), &buf, true, true)
 	require.NoError(t, err)
 
 	require.Equal(t, string(expected), buf.String())

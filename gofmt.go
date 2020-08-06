@@ -31,6 +31,7 @@ package main
 */
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"go/scanner"
@@ -43,6 +44,16 @@ import (
 	"strings"
 )
 
+func isGeneratedCode(src []byte) bool {
+	scanner := bufio.NewScanner(bytes.NewReader(src))
+	for scanner.Scan() {
+		if generatedRegex.MatchString(scanner.Text()) {
+			return true
+		}
+	}
+	return false
+}
+
 // based on https://golang.org/src/cmd/gofmt/gofmt.go with a few modifications
 
 func isGoFile(f os.FileInfo) bool {
@@ -52,7 +63,7 @@ func isGoFile(f os.FileInfo) bool {
 }
 
 // If in == nil, the source is the contents of the file with the given filename.
-func processFile(filename string, in io.Reader, out io.Writer, fixFmt bool) error {
+func processFile(filename string, in io.Reader, out io.Writer, fixFmt, generatedCode bool) error {
 	var perm os.FileMode = 0644
 	if in == nil {
 		f, err := os.Open(filename)
@@ -71,6 +82,16 @@ func processFile(filename string, in io.Reader, out io.Writer, fixFmt bool) erro
 	src, err := ioutil.ReadAll(in)
 	if err != nil {
 		return err
+	}
+
+	if !generatedCode && isGeneratedCode(src) {
+		if !*list {
+			_, err = out.Write(src)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
 	}
 
 	if fixFmt {
@@ -131,7 +152,7 @@ func processFile(filename string, in io.Reader, out io.Writer, fixFmt bool) erro
 
 func visitFile(path string, f os.FileInfo, err error) error {
 	if err == nil && isGoFile(f) {
-		err = processFile(path, nil, os.Stdout, !*noFormat)
+		err = processFile(path, nil, os.Stdout, !*noFormat, *genCode)
 	}
 	// Don't complain if a file was deleted in the meantime (i.e.
 	// the directory changed concurrently while running gofmt).

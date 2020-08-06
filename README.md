@@ -7,7 +7,6 @@ go-groups
 [![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/indeedeng/go-groups.svg)](OSSMETADATA)
 [![GitHub](https://img.shields.io/github/license/indeedeng/go-groups.svg)](LICENSE)
 
-
 # Project Overview
 
 Command `go-groups` is a CLI tool to parse go import blocks, sort, and re-group 
@@ -18,7 +17,6 @@ lexigraphically, it also separates import blocks at a per-project level.
 Like `goimports`, `go-groups` also runs gofmt and fixes any style/formatting
 issues.
 
-
 # Getting Started
 
 The `go-groups` command can be installed by running:
@@ -26,6 +24,20 @@ The `go-groups` command can be installed by running:
 ```
 $ go get oss.indeed.com/go/go-groups
 ```
+
+# Usage
+```
+$ go-groups -h
+  usage: go-groups [flags] [path ...]
+    -d    display diffs instead of rewriting files
+    -f    disables the automatic gofmt style fixes
+    -g    include generated code in analysis
+    -l    list files whose formatting differs
+    -v    display the version of go-groups
+    -w    write result to (source) file instead of stdout
+```
+
+# Formatting Behavior
 
 #### With this example source file input
 ```
@@ -54,10 +66,6 @@ import (
 #### Typical Workflow
 
 Run `go-groups -w ./..` to rewrite and sort import groupings for go source files in a project.
-
-#### More info
-
-`go-groups -h` to print usage help text and available flags
 
 # Asking Questions
 
