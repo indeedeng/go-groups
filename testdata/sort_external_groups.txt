@@ -1,14 +1,14 @@
 package foo
 
 import (
-    "net/http"
-    "testing"
+	"net/http"
+	"testing"
 
-    "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 
-    "github.com/stretchr/testify/suite"
+	"github.com/stretchr/testify/suite"
 
-    "indeed.com/devops/libmarvin/gin/ginhandler"
-    "indeed.com/devops/libmarvin/spec"
-    "indeed.com/devops/marvlet/api/v2"
+	"indeed.com/devops/libmarvin/gin/ginhandler"
+	"indeed.com/devops/libmarvin/spec"
+	"indeed.com/devops/marvlet/api/v2"
 )

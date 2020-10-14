@@ -16,7 +16,7 @@ const (
 	exitBadStdin      = 2
 	exitInternalError = 3
 
-	versionStr = "go-groups version 1.1.2 (2020-08-06)"
+	versionStr = "go-groups version 1.1.3 (2020-10-14)"
 )
 
 var (

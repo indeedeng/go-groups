@@ -14,115 +14,97 @@ func TestParse_NoImports(t *testing.T) {
 	require.False(t, rewritten)
 }
 
-func TestParse_ValidGroupingSortImports(t *testing.T) {
-	bytes := testdata(t, "valid_imports.txt")
-	result, rewritten := parse(bytes)
-
-	require.True(t, rewritten)
-	require.Equal(t, string(bytes), string(result))
-}
-
-func TestParse_ExtraGroups(t *testing.T) {
-	bytes := testdata(t, "extra_groups.txt")
-	result, rewritten := parse(bytes)
-
-	require.True(t, rewritten)
-	require.Equal(t, testdata(t, "valid_imports.txt"), result)
-}
-
-func TestParse_ExternalGroups(t *testing.T) {
-	bytes := testdata(t, "external_groups_invalid.txt")
-	expected := testdata(t, "external_groups.txt")
-	result, rewritten := parse(bytes)
-
-	require.True(t, rewritten)
-	require.Equal(t, string(expected), string(result))
-}
-
-func TestParse_SortingExternalGroups(t *testing.T) {
-	bytes := testdata(t, "sort_external_groups_invalid.txt")
-	expected := testdata(t, "sort_external_groups.txt")
-	result, rewritten := parse(bytes)
-
-	require.True(t, rewritten)
-	require.Equal(t, expected, result)
-}
-
-func TestParse_PrefixedGroups(t *testing.T) {
-	bytes := testdata(t, "prefixed_groups_invalid.txt")
-	expected := testdata(t, "prefixed_groups.txt")
-	result, rewritten := parse(bytes)
-
-	require.True(t, rewritten)
-	require.Equal(t, expected, result)
-}
-
-func TestParse_SubdomainImports(t *testing.T) {
-	bytes := testdata(t, "subdomain_imports_invalid.txt")
-	expected := testdata(t, "subdomain_imports.txt")
-	result, rewritten := parse(bytes)
-
-	require.True(t, rewritten)
-	require.Equal(t, string(expected), string(result))
-}
-
-func TestParse_CommentedImports(t *testing.T) {
-	bytes := testdata(t, "commented_imports.txt")
-	result, rewritten := parse(bytes)
-	require.True(t, rewritten)
-	require.Equal(t, string(bytes), string(result))
-}
-
-func TestParse_Multiline_CommentedImports(t *testing.T) {
-	bytes := testdata(t, "multiline_comments_invalid.txt")
-	expected := testdata(t, "multiline_comments.txt")
-	result, rewritten := parse(bytes)
-	require.True(t, rewritten)
-	require.Equal(t, string(expected), string(result))
-}
-
-func TestParse_gofmt(t *testing.T) {
-	b := testdata(t, "gofmt_invalid.txt")
-	expected := testdata(t, "gofmt.txt")
-
+func TestParse(t *testing.T) {
+	type testcase struct {
+		Description     string
+		ActualFixture   string
+		ExpectedFixture string
+		NoGoFmt         bool
+		GenCode         bool
+	}
+	testcases := []testcase{
+		{
+			Description:     "go-groups should not modify sorted import blocks",
+			ActualFixture:   "valid_imports.txt",
+			ExpectedFixture: "valid_imports.txt",
+		},
+		{
+			Description:     "go-groups should merge multiple import groups",
+			ActualFixture:   "extra_groups.txt",
+			ExpectedFixture: "valid_imports.txt",
+		},
+		{
+			Description:     "go-groups should group external imports",
+			ActualFixture:   "external_groups_invalid.txt",
+			ExpectedFixture: "external_groups.txt",
+		},
+		{
+			Description:     "go-groups should sort external imports",
+			ActualFixture:   "sort_external_groups_invalid.txt",
+			ExpectedFixture: "sort_external_groups.txt",
+		},
+		{
+			Description:     "go-groups should handle import prefixes",
+			ActualFixture:   "prefixed_groups_invalid.txt",
+			ExpectedFixture: "prefixed_groups.txt",
+		},
+		{
+			Description:     "go-groups should group subdomain external imports",
+			ActualFixture:   "subdomain_imports_invalid.txt",
+			ExpectedFixture: "subdomain_imports.txt",
+		},
+		{
+			Description:     "go-groups should preserve comments in imports",
+			ActualFixture:   "commented_imports.txt",
+			ExpectedFixture: "commented_imports.txt",
+		},
+		{
+			Description:     "go-groups should group multi-line comments in imports",
+			ActualFixture:   "multiline_comments_invalid.txt",
+			ExpectedFixture: "multiline_comments.txt",
+			NoGoFmt:         true,
+		},
+		{
+			Description:     "go-groups should run gofmt over source code",
+			ActualFixture:   "gofmt_invalid.txt",
+			ExpectedFixture: "gofmt.txt",
+		},
+		{
+			Description:     "go-groups should not run gofmt over source code",
+			ActualFixture:   "gofmt_invalid.txt",
+			ExpectedFixture: "gofmt_invalid.txt",
+			NoGoFmt:         true,
+		},
+		{
+			Description:     "go-groups should not run over generated code",
+			ActualFixture:   "code_generated.txt",
+			ExpectedFixture: "code_generated.txt",
+		},
+		{
+			Description:     "go-groups should run over generated code",
+			ActualFixture:   "code_generated.txt",
+			ExpectedFixture: "code_generated_valid.txt",
+			GenCode:         true,
+		},
+		{
+			Description:     "go-groups order imports with lint comments",
+			ActualFixture:   "import_with_lint_comment.txt",
+			ExpectedFixture: "import_with_lint_comment.txt",
+		},
+	}
 	var buf bytes.Buffer
-	err := processFile("", strings.NewReader(string(b)), &buf, true, false)
-	require.NoError(t, err)
+	for _, testcase := range testcases {
+		bytes := testdata(t, testcase.ActualFixture)
+		expected := testdata(t, testcase.ExpectedFixture)
+		err := processFile("", strings.NewReader(string(bytes)), &buf, !testcase.NoGoFmt, testcase.GenCode)
 
-	require.Equal(t, string(expected), buf.String())
-}
-
-func TestParse_gofmt_disabled(t *testing.T) {
-	b := testdata(t, "gofmt_invalid.txt")
-	expected := testdata(t, "gofmt_invalid.txt")
-
-	var buf bytes.Buffer
-	err := processFile("", strings.NewReader(string(b)), &buf, false, false)
-	require.NoError(t, err)
-
-	require.Equal(t, string(expected), buf.String())
-}
-
-func TestParse_generated_code(t *testing.T) {
-	b := testdata(t, "code_generated.txt")
-	expected := testdata(t, "code_generated.txt")
-
-	var buf bytes.Buffer
-	err := processFile("", strings.NewReader(string(b)), &buf, true, false)
-	require.NoError(t, err)
-
-	require.Equal(t, string(expected), buf.String())
-}
-
-func TestParse_generated_code_enabled(t *testing.T) {
-	b := testdata(t, "code_generated.txt")
-	expected := testdata(t, "code_generated_valid.txt")
-
-	var buf bytes.Buffer
-	err := processFile("", strings.NewReader(string(b)), &buf, true, true)
-	require.NoError(t, err)
-
-	require.Equal(t, string(expected), buf.String())
+		if buf.String() != string(expected) {
+			t.Logf("Input: \n%s\n\nOutput: \n%s\n\nExpected: \n%s\n\n", string(bytes), buf.String(), string(expected))
+		}
+		require.NoError(t, err)
+		require.Equal(t, string(expected), buf.String(), testcase.Description)
+		buf.Reset()
+	}
 }
 
 func testdata(t *testing.T, str string) []byte {

@@ -9,7 +9,7 @@ go-groups
 
 # Project Overview
 
-Command `go-groups` is a CLI tool to parse go import blocks, sort, and re-group 
+Command `go-groups` is a CLI tool to deterministically rewrite go import blocks to sort and re-group 
 the imports.
 
 `go-groups` is similar to `goimports`, but in addition to sorting imports 
