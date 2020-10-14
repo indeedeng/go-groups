@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var commentRegex = regexp.MustCompile(`(//.*)|(/\*.*\*\/)`)
+var commentRegex = regexp.MustCompile(`(//.*)|(/\*.*\*/)`)
 
 // Imports represents the list of imports in a given go file.
 // This helper encapsulates the logic for sorting imports based on go-groups.
