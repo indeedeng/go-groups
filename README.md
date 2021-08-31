@@ -22,7 +22,7 @@ issues.
 The `go-groups` command can be installed by running:
 
 ```
-$ go get oss.indeed.com/go/go-groups
+$ go install oss.indeed.com/go/go-groups@latest
 ```
 
 # Usage
